@@ -97,13 +97,6 @@ export async function POST(request: NextRequest) {
         title: "个人简介",
         content: ""
       },
-      education: {
-        title: "教育背景",
-        school: "北京大学",
-        period: "2018-2022",
-        details: "计算机科学与技术 本科",
-        image: ""
-      },
       skills: {
         title: "技能专长",
         items: [
