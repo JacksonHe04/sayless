@@ -37,6 +37,7 @@ export interface HeaderData {
 export interface EducationData {
   title: string
   school: string
+  base: string
   period: string
   details: string
   image?: string

@@ -58,7 +58,7 @@ export default function Header({
           {/* 姓名和职位 */}
           <div className="mb-3 sm:mb-4">
             <h1 className={TITLE_STYLES.main}>{name}</h1>
-            <p className={`${TITLE_STYLES.subtitle} font-serif`}><b>{jobInfo.position}</b></p>
+            <p className={`${TITLE_STYLES.subtitle} font-[Georgia]`}><b>{jobInfo.position}</b></p>
           </div>
 
           {/* 联系方式信息 */}
@@ -67,10 +67,10 @@ export default function Header({
             <div className={`flex flex-col sm:flex-row gap-2 sm:gap-8 ${
               alignment === 'center' ? 'sm:justify-center' : ''
             }`}>
-              <p className={`${TEXT_STYLES.base} font-serif`}>
+              <p className={`${TEXT_STYLES.base}`}>
                 <b>电话/微信：</b>{contact.phone}
               </p>
-              <p className={`${TEXT_STYLES.base} font-serif`}>
+              <p className={`${TEXT_STYLES.base}`}>
                 <b>邮箱：</b>
                 <Link href={`mailto:${contact.email}`} underline={false}>
                   {contact.email}
@@ -84,7 +84,7 @@ export default function Header({
                 <div className="hidden sm:grid w-full" style={{ gridTemplateColumns: '1fr auto 1fr', gap: '1rem' }}>
                   <div className="flex items-center justify-end">
                     {contact.homepage && (
-                      <p className={`${TEXT_STYLES.base} font-serif`}>
+                      <p className={`${TEXT_STYLES.base}`}>
                         <b>主页：</b>
                         <Link href={contact.homepage.url}>
                           {contact.homepage.text}
@@ -109,8 +109,8 @@ export default function Header({
                   </div>
                   <div className="flex items-center justify-start">
                     {contact.github && (
-                      <p className={`${TEXT_STYLES.base} font-serif`}>
-                        GitHub:&nbsp;
+                      <p className={`${TEXT_STYLES.base}`}>
+                        <b>GitHub:</b>&nbsp;
                         <Link href={contact.github.url}>
                           {contact.github.text}
                         </Link>
@@ -121,7 +121,7 @@ export default function Header({
                 <div className="sm:hidden space-y-2">
                   <div className="flex flex-col gap-2">
                     {contact.homepage && (
-                      <p className={`${TEXT_STYLES.base} font-serif`}>
+                      <p className={`${TEXT_STYLES.base}`}>
                         <b>主页：</b>
                         <Link href={contact.homepage.url}>
                           {contact.homepage.text}
@@ -129,8 +129,8 @@ export default function Header({
                       </p>
                     )}
                     {contact.github && (
-                      <p className={`${TEXT_STYLES.base} font-serif`}>
-                        GitHub:&nbsp;
+                      <p className={`${TEXT_STYLES.base}`}>
+                        <b>GitHub:</b>&nbsp;
                         <Link href={contact.github.url}>
                           {contact.github.text}
                         </Link>
@@ -145,7 +145,7 @@ export default function Header({
               }`}>
                 <div className={`flex flex-col sm:flex-row gap-2 sm:gap-8`}>
                   {contact.homepage && (
-                    <p className={`${TEXT_STYLES.base} font-serif`}>
+                    <p className={`${TEXT_STYLES.base}`}>
                       <b>主页：</b>
                       <Link href={contact.homepage.url}>
                         {contact.homepage.text}
@@ -153,8 +153,8 @@ export default function Header({
                     </p>
                   )}
                   {contact.github && (
-                    <p className={`${TEXT_STYLES.base} font-serif`}>
-                      GitHub:&nbsp;
+                    <p className={`${TEXT_STYLES.base}`}>
+                      <b>GitHub:</b>&nbsp;
                       <Link href={contact.github.url}>
                         {contact.github.text}
                       </Link>

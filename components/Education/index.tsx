@@ -14,7 +14,7 @@ export default function Education() {
       <SectionTitle>{education.title}</SectionTitle>
       <div className={CONTAINER_STYLES.project}>
         <div className={LAYOUT_STYLES.flexBetweenMb}>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {education.image && (
               <UniversalImage
                 src={education.image}
@@ -28,7 +28,10 @@ export default function Education() {
               <span className="font-bold">{education.school}</span>
             </h3>
           </div>
-          <span className={TEXT_STYLES.period}>{education.period}</span>
+          <div className="flex items-center gap-1 flex-wrap">
+            <span className={TEXT_STYLES.period}>{education.base}</span>
+            <span className={TEXT_STYLES.period}>｜{education.period}</span>
+          </div>
         </div>
         <p className={TEXT_STYLES.base}>{education.details}</p>
       </div>

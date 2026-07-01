@@ -20,7 +20,8 @@
   "education": {
     "title": "教育经历",
     "school": "东南大学（985）",
-    "period": "南京｜2022-09 ~ 2027-06",
+    "base": "南京",
+    "period": "2022-09 ~ 2027-06",
     "details": "人工智能学院 ｜ 人工智能 ｜ 本科",
     "image": "https://raw.githubusercontent.com/JacksonHe04/public-disk/df20db8d9ea9906395316106a4f37a3670e15b4a/seu_logo_svg_full.svg"
   },
