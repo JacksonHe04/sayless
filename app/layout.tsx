@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <head>
-        <script 
+        <script
           src="https://cdn.tailwindcss.com"
           async
         ></script>
@@ -30,25 +30,15 @@ export default function RootLayout({
                   tailwind.config = {
                     theme: {
                       extend: {
-                          fontFamily: {
-                            sans: [
-                              "-apple-system",
-                              "BlinkMacSystemFont",
-                              "PingFang SC",
-                              "Microsoft YaHei",
-                              "Helvetica Neue",
-                              "Arial",
-                              "sans-serif"
-                            ],
-                            serif: [
-                              "Georgia",
-                              "Times New Roman",
-                              "Songti SC",
-                              "SimSun",
-                              "serif"
-                            ],
-                          },
+                        fontFamily: {
+                          serif: [
+                            "Times New Roman",
+                            "SimSun",
+                            "宋体",
+                            "serif"
+                          ],
                         },
+                      },
                     },
                   };
                 }
