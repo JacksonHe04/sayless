@@ -68,7 +68,7 @@ export default function Header({
               alignment === 'center' ? 'sm:justify-center' : ''
             }`}>
               <p className={`${TEXT_STYLES.base}`}>
-                <b>电话/微信：</b>{contact.phone}
+                <b>电话 / 微信：</b>{contact.phone}
               </p>
               <p className={`${TEXT_STYLES.base}`}>
                 <b>邮箱：</b>

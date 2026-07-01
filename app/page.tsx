@@ -173,7 +173,7 @@ export default function Home() {
 
     // 添加联系方式
     markdown += `## 联系方式\n`
-    markdown += `- 电话/微信：${data.header.contact.phone}\n`
+    markdown += `- 电话 / 微信：${data.header.contact.phone}\n`
     markdown += `- 邮箱：${data.header.contact.email}\n`
     if (data.header.contact.github) {
       markdown += `- GitHub：[${data.header.contact.github.text}](${data.header.contact.github.url})\n`
