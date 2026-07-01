@@ -9,6 +9,9 @@ import { LAYOUT_STYLES, TEXT_STYLES, CONTAINER_STYLES, TITLE_STYLES } from '@/co
 export default function Education() {
   const { education } = getCurrentResumeData()
 
+  // 如果没有教育经历数据，不渲染组件
+  if (!education) return null
+
   return (
     <SectionContainer>
       <SectionTitle>{education.title}</SectionTitle>

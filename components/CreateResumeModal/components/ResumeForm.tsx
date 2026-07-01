@@ -369,7 +369,7 @@ export default function ResumeForm({ onSuccess, initialData }: ResumeFormProps) 
           <label className="block text-sm font-medium text-gray-700 mb-1">学校名称</label>
           <input
             type="text"
-            value={formData.education.school}
+            value={formData.education?.school}
             onChange={(e) => updateFormData('education', 'school', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="请输入学校名称"
@@ -380,7 +380,7 @@ export default function ResumeForm({ onSuccess, initialData }: ResumeFormProps) 
           <label className="block text-sm font-medium text-gray-700 mb-1">就读时间</label>
           <input
             type="text"
-            value={formData.education.period}
+            value={formData.education?.period}
             onChange={(e) => updateFormData('education', 'period', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="如：2018-2022"
@@ -392,7 +392,7 @@ export default function ResumeForm({ onSuccess, initialData }: ResumeFormProps) 
         <label className="block text-sm font-medium text-gray-700 mb-1">专业详情</label>
         <input
           type="text"
-          value={formData.education.details}
+          value={formData.education?.details}
           onChange={(e) => updateFormData('education', 'details', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="如：计算机科学与技术 本科"

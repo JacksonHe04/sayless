@@ -75,13 +75,13 @@ export default function JsonPreview({ resumeData, onConfirm, onEdit, onCancel }:
       )}
 
       {/* 教育背景 */}
-      {(resumeData.education.school || resumeData.education.period || resumeData.education.details) && (
+      {resumeData.education && (resumeData.education.school || resumeData.education.period || resumeData.education.details) && (
         <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="text-lg font-semibold text-gray-900 mb-3">{resumeData.education.title}</h4>
+          <h4 className="text-lg font-semibold text-gray-900 mb-3">{resumeData.education?.title}</h4>
           <div className="text-sm text-gray-700">
-            <div><span className="font-medium">学校：</span>{resumeData.education.school || '未填写'}</div>
-            <div><span className="font-medium">时间：</span>{resumeData.education.period || '未填写'}</div>
-            <div><span className="font-medium">专业：</span>{resumeData.education.details || '未填写'}</div>
+            <div><span className="font-medium">学校：</span>{resumeData.education?.school || '未填写'}</div>
+            <div><span className="font-medium">时间：</span>{resumeData.education?.period || '未填写'}</div>
+            <div><span className="font-medium">专业：</span>{resumeData.education?.details || '未填写'}</div>
           </div>
         </div>
       )}
