@@ -24,14 +24,14 @@ function InternItem({ intern }: { intern: InternItemType }) {
   return (
     <div className={CONTAINER_STYLES.project}>
       <div className={COMBINED_STYLES.projectTitleRow}>
-        <div className="flex items-baseline gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           {intern.image && (
-            <Image 
-              src={intern.image} 
+            <Image
+              src={intern.image}
               alt={`${intern.company} logo`}
               width={36}
               height={36}
-              className="object-contain flex-shrink-0 self-center"
+              className="object-contain flex-shrink-0"
             />
           )}
           <h3 className={`${TITLE_STYLES.project} leading-none`}>

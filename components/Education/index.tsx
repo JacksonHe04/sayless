@@ -14,14 +14,14 @@ export default function Education() {
       <SectionTitle>{education.title}</SectionTitle>
       <div className={CONTAINER_STYLES.project}>
         <div className={LAYOUT_STYLES.flexBetweenMb}>
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-center gap-2">
             {education.image && (
-              <UniversalImage 
-                src={education.image} 
+              <UniversalImage
+                src={education.image}
                 alt={`${education.school} logo`}
                 width={36}
                 height={36}
-                className="object-contain self-center"
+                className="object-contain flex-shrink-0"
               />
             )}
             <h3 className={`${TITLE_STYLES.project} leading-none`}>
