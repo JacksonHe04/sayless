@@ -1,12 +1,10 @@
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
 /**
  * 类名合并工具函数
- * 用于合并和处理CSS类名，支持条件类名
- * @param classes - 类名数组或字符串
- * @returns 合并后的类名字符串
+ * 用于合并和处理CSS类名，支持条件类名与 Tailwind 冲突覆盖
  */
-export function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes
-    .filter(Boolean)
-    .join(' ')
-    .trim()
+export function cn(...inputs: ClassValue[]): string {
+  return twMerge(clsx(inputs));
 }

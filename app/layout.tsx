@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Providers } from '@/components/providers'
 import '@/styles/globals.css'
 
 export const metadata: Metadata = {
@@ -16,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" suppressHydrationWarning>
       <head>
         <script
           src="https://cdn.tailwindcss.com"
@@ -48,7 +49,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans leading-6 text-black mx-auto p-4 m-0 bg-gray-100 rounded-2xl border border-gray-400 print:bg-white print:rounded-none print:border-0 print:p-0">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   )
