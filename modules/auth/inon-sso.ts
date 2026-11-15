@@ -27,6 +27,8 @@ export function getInonProjectSso() {
     clientSecret: requiredEnvironmentVariable("INON_SSO_CLIENT_SECRET"),
     sessionSecret: requiredEnvironmentVariable("INON_SSO_SESSION_SECRET"),
     appOrigin,
+    issuer:
+      process.env.INON_SSO_ISSUER ?? "https://sso.inon.space/api/sso/auth",
     secureCookies: appOrigin.startsWith("https://"),
   });
   return client;
