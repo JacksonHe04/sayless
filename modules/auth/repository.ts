@@ -15,7 +15,6 @@ import {
   emailVerificationCodes,
   passwordResetTokens,
   sessions,
-  userPreferences,
   users,
 } from "@/db/schema";
 import type {
@@ -121,13 +120,6 @@ export function createAuthRepository(database: Database): AuthRepository {
             ),
           ),
         database.insert(users).values(user),
-        database.insert(userPreferences).values({
-          userId: user.id,
-          currentBatchId: null,
-          timezone: "Asia/Singapore",
-          createdAt: now,
-          updatedAt: now,
-        }),
       ]);
     },
 

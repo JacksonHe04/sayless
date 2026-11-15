@@ -5,12 +5,6 @@ const PUBLIC_ROUTES = [
   "/login",
   "/register",
   "/resumes",
-  "/resumes",
-  "/submissions",
-  "/interviews",
-  "/questions",
-  "/companies",
-  "/batches",
   "/settings",
 ];
 

@@ -2,30 +2,27 @@ import { expect, test } from "@playwright/test";
 
 import { login } from "@/e2e/helpers";
 
-test("lets visitors browse, requires login on write, and supports login", async ({
+test("lets visitors browse resumes and requires login for account settings", async ({
   page,
 }) => {
   await page.goto("/resumes");
   await expect(
-    page.getByRole("heading", { name: /简历/ }),
+    page.getByRole("main", { name: "简历预览" }),
   ).toBeVisible();
 
-  await page.goto("/batches");
-  await page.getByRole("button", { name: "新建批次" }).first().click();
-  const batchDialog = page.getByRole("dialog", { name: "新建批次" });
-  await batchDialog
-    .getByRole("textbox", { name: "批次名称", exact: true })
-    .fill("访客不可写");
-  await batchDialog.getByRole("button", { name: "创建批次" }).click();
-  await expect(page).toHaveURL(
-    /\/login\?next=%2Fbatches$/,
-  );
+  await page.goto("/settings");
+  await expect(
+    page.getByRole("heading", { name: "登录后管理个人设置" }),
+  ).toBeVisible();
+});
 
+test("lets a registered user sign in and out", async ({ page }) => {
   await login(page);
   await expect(
-    page.getByRole("heading", { name: /简历/ }),
+    page.getByRole("main", { name: "简历预览" }),
   ).toBeVisible();
 
-  await page.getByRole("button", { name: "退出" }).click();
+  await page.goto("/settings");
+  await page.getByRole("button", { name: "退出 SAYLESS" }).click();
   await expect(page).toHaveURL(/\/login$/);
 });

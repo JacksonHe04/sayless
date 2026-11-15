@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Building2,
-  CalendarRange,
-  FileText,
-  HelpCircle,
-  Send,
-  Video,
-} from "lucide-react";
+import { FileText } from "lucide-react";
 import Link from "next/link";
 import { BrandMark } from "@/components/ui/brand-mark";
 import {
@@ -33,14 +26,7 @@ export const NAV_ITEMS: ReadonlyArray<{
   href: string;
   label: string;
   icon: Icon;
-}> = [
-  { href: "/resumes", label: "简历", icon: FileText },
-  { href: "/submissions", label: "投递", icon: Send },
-  { href: "/interviews", label: "面试", icon: Video },
-  { href: "/questions", label: "题库", icon: HelpCircle },
-  { href: "/companies", label: "公司", icon: Building2 },
-  { href: "/batches", label: "批次", icon: CalendarRange },
-];
+}> = [{ href: "/resumes", label: "简历", icon: FileText }];
 
 function isActivePath(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);

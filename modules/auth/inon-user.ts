@@ -2,7 +2,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 
 import * as schema from "@/db/schema";
-import { userPreferences, users } from "@/db/schema";
+import { users } from "@/db/schema";
 
 type Database = DrizzleD1Database<typeof schema>;
 type ProjectUser = typeof users.$inferSelect;
@@ -143,16 +143,7 @@ async function createProjectUser(
   };
 
   try {
-    await database.batch([
-      database.insert(users).values(user),
-      database.insert(userPreferences).values({
-        userId: user.id,
-        currentBatchId: null,
-        timezone: "Asia/Singapore",
-        createdAt: now,
-        updatedAt: now,
-      }),
-    ]);
+    await database.insert(users).values(user).run();
   } catch (error) {
     const linked = await findByInonUserId(database, identity.id);
     if (linked) {

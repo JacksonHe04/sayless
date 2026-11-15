@@ -34,25 +34,11 @@ describe("SAYLESS application sidebar", () => {
       within(navigation)
         .getAllByRole("link")
         .map((link) => link.textContent?.trim()),
-    ).toEqual([
-      "简历",
-      "投递",
-      "面试",
-      "题库",
-      "公司",
-      "批次",
-    ]);
+    ).toEqual(["简历"]);
   });
 
-  it("keeps batches in the same navigation group below companies", () => {
-    expect(NAV_ITEMS.map((item) => item.label)).toEqual([
-      "简历",
-      "投递",
-      "面试",
-      "题库",
-      "公司",
-      "批次",
-    ]);
+  it("keeps resumes as the only navigation entry", () => {
+    expect(NAV_ITEMS.map((item) => item.label)).toEqual(["简历"]);
   });
 
   it("shows a login action instead of account actions for guests", () => {

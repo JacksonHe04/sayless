@@ -1,10 +1,11 @@
 import {
   ArrowRight,
-  CalendarCheck,
   Check,
+  Download,
   FileText,
-  MessageSquareText,
-  Send,
+  LayoutTemplate,
+  PenLine,
+  Share2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -19,24 +20,24 @@ import {
 } from "@/components/ui/card";
 
 const FLOW = [
-  { label: "整理简历", icon: FileText },
-  { label: "记录投递", icon: Send },
-  { label: "准备面试", icon: CalendarCheck },
-  { label: "沉淀答案", icon: MessageSquareText },
+  { label: "填写内容", icon: PenLine },
+  { label: "调整样式", icon: LayoutTemplate },
+  { label: "实时预览", icon: FileText },
+  { label: "导出分享", icon: Download },
 ] as const;
 
 const FEATURES = [
   {
-    title: "完整链路",
-    description: "从简历到每轮选拔，所有记录沿同一条求职路径向前推进。",
+    title: "结构化编辑",
+    description: "教育、实习、项目按模块维护，改一处即可在预览中立刻看到结果。",
   },
   {
-    title: "清晰状态",
-    description: "投递状态跟随面试结果自动更新，不再手动维护重复信息。",
+    title: "专业排版",
+    description: "A4 版式、分区配置与间距控制，让内容与排面同时立得住。",
   },
   {
-    title: "持续沉淀",
-    description: "为每个问题维护标准答案，并按需关联到具体面试。",
+    title: "导出与分享",
+    description: "随时导出 PDF、复制 Markdown，或生成链接把简历分享给别人。",
   },
 ] as const;
 
@@ -65,40 +66,40 @@ export default function LandingPage() {
 
       <section className="mx-auto max-w-7xl px-5 pb-20 pt-20 text-center sm:px-8 sm:pb-28 sm:pt-28">
         <Badge variant="outline" className="mb-6 rounded-full px-3 py-1">
-          为完整求职流程而做
+          专注简历本身
         </Badge>
         <h1 className="mx-auto max-w-5xl text-balance text-[clamp(3rem,7vw,6.4rem)] font-semibold leading-[0.94] tracking-[-0.075em]">
-          别让求职，
+          别让简历，
           <br />
-          散落在不同地方。
+          被工具打断。
         </h1>
         <p className="mx-auto mt-7 max-w-2xl text-balance text-base leading-7 text-muted-foreground sm:text-lg">
-          SAYLESS 把简历、已投递岗位、每一轮选拔和面试题放在同一个系统里。看清全局，然后专注下一步。
+          SAYLESS 只做一件事：把简历写得清楚、排得专业。边写边看，随时导出，也可以直接分享给任何人。
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Button size="lg" asChild>
             <Link href="/register">
-              建立我的求职路径
+              开始写我的简历
               <ArrowRight data-icon="inline-end" />
             </Link>
           </Button>
           <Button size="lg" variant="outline" asChild>
-            <Link href="/resumes">先浏览产品</Link>
+            <Link href="/resumes">直接试用编辑器</Link>
           </Button>
         </div>
         <p className="mt-4 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
           <Check className="size-3.5" />
-          完全免费，无需登录即可浏览
+          完全免费，无需登录即可编辑
         </p>
 
         <Card className="mx-auto mt-16 max-w-5xl text-left shadow-xl shadow-black/[0.04]">
           <CardHeader className="border-b border-border">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs text-muted-foreground">当前批次</p>
-                <CardTitle className="mt-1">2026 夏季产品岗</CardTitle>
+                <p className="text-xs text-muted-foreground">正在编辑</p>
+                <CardTitle className="mt-1">我的简历</CardTitle>
               </div>
-              <Badge variant="secondary">进行中</Badge>
+              <Badge variant="secondary">自动保存</Badge>
             </div>
           </CardHeader>
           <CardContent className="py-6">
@@ -123,9 +124,9 @@ export default function LandingPage() {
 
             <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_1fr_1fr_1.6fr]">
               {[
-                ["已投递", "24"],
-                ["进行中", "8"],
-                ["面试", "5"],
+                ["模块", "6"],
+                ["版本", "12"],
+                ["公开", "1"],
               ].map(([label, value]) => (
                 <div
                   key={label}
@@ -140,15 +141,15 @@ export default function LandingPage() {
                 </div>
               ))}
               <div className="rounded-lg border border-border px-4 py-4">
-                <p className="text-xs text-muted-foreground">下一场面试</p>
+                <p className="text-xs text-muted-foreground">分享状态</p>
                 <div className="mt-2 flex items-end justify-between gap-4">
                   <div>
-                    <p className="text-sm font-medium">产品案例面 · 第二轮</p>
+                    <p className="text-sm font-medium">链接已就绪</p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      7 月 28 日，14:00
+                      任何人可查看最新版本
                     </p>
                   </div>
-                  <span className="font-mono text-xs">03 DAYS</span>
+                  <Share2 className="size-4 text-muted-foreground" />
                 </div>
               </div>
             </div>
@@ -173,7 +174,7 @@ export default function LandingPage() {
 
       <footer className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-10 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-8">
         <span>© 2026 SAYLESS</span>
-        <span>把复杂留给系统，把注意力留给下一步。</span>
+        <span>把复杂留给系统，把注意力留给内容。</span>
       </footer>
     </main>
   );

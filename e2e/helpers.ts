@@ -2,8 +2,6 @@ import { expect, type Page } from "@playwright/test";
 
 export const DEMO_EMAIL = "demo@local.sayless.app";
 export const DEMO_PASSWORD = "sayless-demo-2026";
-export const ISOLATED_EMAIL = "isolated@local.sayless.app";
-export const ISOLATED_PASSWORD = "sayless-isolated-2026";
 
 export async function login(
   page: Page,
@@ -16,5 +14,5 @@ export async function login(
   await page
     .getByRole("button", { name: "登录", exact: true })
     .click();
-  await expect(page).toHaveURL(/\/app$/);
+  await expect(page).toHaveURL(/\/resumes/);
 }

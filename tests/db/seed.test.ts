@@ -4,17 +4,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { seed } from "@/db/seed";
 import * as schema from "@/db/schema";
-import {
-  batches,
-  interviews,
-  officialCompanies,
-  officialPositions,
-  questions,
-  stages,
-  submissions,
-  users,
-} from "@/db/schema";
-import { OFFICIAL_STAGES } from "@/db/seed/catalog";
+import { resumes, users } from "@/db/schema";
 import { createTestD1Binding } from "@/tests/db/d1-test-binding";
 
 describe("database seed", () => {
@@ -30,16 +20,7 @@ describe("database seed", () => {
   afterEach(() => close());
 
   async function counts() {
-    const tables = [
-      officialCompanies,
-      officialPositions,
-      stages,
-      users,
-      batches,
-      submissions,
-      interviews,
-      questions,
-    ] as const;
+    const tables = [users, resumes] as const;
     return Promise.all(
       tables.map(async (table) => {
         const [result] = await database
@@ -63,19 +44,6 @@ describe("database seed", () => {
     await seed(database, options);
 
     expect(await counts()).toEqual(first);
-    expect(first).toEqual([8, 7, 11, 1, 2, 5, 4, 3]);
-    expect(OFFICIAL_STAGES.map(([, , name]) => name)).toEqual([
-      "测评",
-      "笔试",
-      "AI 面试",
-      "群面",
-      "电话面试",
-      "一面",
-      "二面",
-      "三面",
-      "业务面",
-      "HR 面",
-      "终面",
-    ]);
+    expect(first).toEqual([1, 1]);
   });
 });

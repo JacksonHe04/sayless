@@ -1,7 +1,6 @@
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 
 import * as schema from "@/db/schema";
-import { seedOfficialCatalog } from "@/db/seed/catalog";
 import { seedDemoUserData } from "@/db/seed/demo";
 
 type Database = DrizzleD1Database<typeof schema>;
@@ -14,10 +13,9 @@ export async function seed(
   } = {},
 ) {
   const now = options.now ?? new Date();
-  await seedOfficialCatalog(database, now);
   if (options.demo) {
     await seedDemoUserData(database, { ...options.demo, now });
   }
 }
 
-export { seedDemoUserData, seedOfficialCatalog };
+export { seedDemoUserData };

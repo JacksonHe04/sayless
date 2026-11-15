@@ -1,9 +1,8 @@
-import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import * as schema from "@/db/schema";
-import { userPreferences, users } from "@/db/schema";
+import { users } from "@/db/schema";
 import {
   InonIdentityLinkError,
   resolveInonProjectUser,
@@ -56,7 +55,7 @@ describe("iNon identity mapping", () => {
     });
   });
 
-  it("creates one local owner and preferences for a new verified identity", async () => {
+  it("creates one local owner for a new verified identity", async () => {
     const user = await resolveInonProjectUser(database, {
       id: "inon-new-user",
       email: "new@example.com",
@@ -69,12 +68,6 @@ describe("iNon identity mapping", () => {
       email: "new@example.com",
       name: "new",
     });
-    await expect(
-      database
-        .select()
-        .from(userPreferences)
-        .where(eq(userPreferences.userId, user.id)),
-    ).resolves.toHaveLength(1);
   });
 
   it("never migrates local data from an unverified central email", async () => {

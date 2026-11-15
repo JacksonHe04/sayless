@@ -56,7 +56,7 @@ describe("D1 authentication repository", () => {
     ).resolves.toBeNull();
   });
 
-  it("atomically consumes a code while creating the user and preferences", async () => {
+  it("atomically consumes a code while creating the user", async () => {
     const now = new Date("2026-07-25T00:00:00.000Z");
     const code: VerificationCodeRecord = {
       id: "code-a",
