@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { saylessLoginPath } from "@/modules/auth/paths";
+import { saylessAccountUrl, saylessLoginPath } from "@/modules/auth/paths";
 
 export function legacyAuthDisabledResponse(): NextResponse {
   return NextResponse.json(
@@ -22,7 +22,7 @@ export function centralAccountManagedResponse(): NextResponse {
         code: "INON_ACCOUNT_MANAGED",
         message: "用户名、密码和账号安全由 iNon 统一账号管理。",
       },
-      accountUrl: "https://inon.space/sso/account",
+      accountUrl: saylessAccountUrl,
     },
     { status: 410 },
   );

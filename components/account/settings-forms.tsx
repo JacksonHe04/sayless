@@ -1,7 +1,7 @@
 import { ExternalLink, LogOut } from "lucide-react";
 
 import { Button, Card } from "@/components/ui";
-import { saylessLogoutPath } from "@/modules/auth/paths";
+import { saylessAccountUrl, saylessLogoutPath } from "@/modules/auth/paths";
 
 export function SettingsForms({
   user,
@@ -26,7 +26,7 @@ export function SettingsForms({
           </div>
           <div>
             <Button asChild>
-              <a href="https://inon.space/sso/account">
+              <a href={saylessAccountUrl}>
                 管理用户名、密码与会话
                 <ExternalLink aria-hidden="true" />
               </a>
