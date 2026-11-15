@@ -4,18 +4,12 @@
 
 ## 当前实现
 
-SAYLESS 当前围绕个人求职流程实现以下模块：
+SAYLESS 当前只围绕简历实现以下模块：
 
 - **Auth / Account**：通过 iNon SSO 使用统一的邮箱验证码、邮箱或用户名密码与 GitHub 登录；用户名、密码和设备会话在 iNon 账号中心管理。
-- **Dashboard**：当前 Batch、投递指标、阶段转化与近期面试。
-- **Batches**：创建、编辑、归档求职批次，并设置唯一的 `currentBatchId`。
-- **Resumes**：创建、克隆、编辑结构化简历内容和展示配置。
-- **Submissions**：记录公司、职位、JD、渠道、地点、投递时间和当前状态。
-- **Interviews**：维护 submission 下的选拔轮次、时间安排、结果与复盘。
-- **Questions**：独立维护 Markdown 问答，并关联至具体面试。
-- **Catalog**：浏览公共公司与职位目录，并维护用户私有记录。
+- **Resumes**：创建、克隆、编辑结构化简历内容和展示配置；访客数据按浏览器匿名设备隔离，登录用户数据按 `userId` 归属。
 
-业务数据以 `userId` 归属于单个用户。公共目录可供所有用户读取，用户创建的实体仅对本人可见。面试状态更新会通过领域服务推进对应 submission 的 `directStatus` 和 `statusSource`；相关规则集中在 `modules/interviews/status.ts` 与 `modules/submissions/status.ts`，不要在 UI 中复制状态推导逻辑。
+访客简历落库时 `userId` 使用 `DEMO_USER_ID` 以满足外键约束，实际用 `guest_device_id` 做设备级隔离；登录用户只读取 `guest_device_id IS NULL` 的行。相关规则集中在 `modules/resumes/repository.ts` 与 `modules/auth/anon-id.ts`，不要在 UI 中复制。
 
 ## 系统架构
 
@@ -97,16 +91,16 @@ sayless/
 ├── app/
 │   ├── (marketing)/        # 落地页
 │   ├── (auth)/             # 跳转中央 iNon SSO 的兼容入口
-│   ├── (app)/app/          # 主要产品页面
+│   ├── (app)/              # 产品页面（简历编辑器、账号设置）
 │   └── api/                # REST API 路由
 ├── components/
-│   ├── app/                # 应用外壳、导航和通用工作区
+│   ├── app/                # 应用外壳、导航和通用工具
 │   ├── ui/                 # 可复用 UI 基础组件
 │   └── <domain>/           # 各领域的交互组件
 ├── modules/<domain>/       # schema、action、service、repository 与领域规则
 ├── db/
 │   ├── schema/             # Drizzle 数据模型
-│   └── seed/               # 公共目录、演示和本地测试数据
+│   └── seed/               # 演示和本地测试数据
 ├── drizzle/                # 版本化 D1 SQL migrations
 ├── workers/d1-gateway.ts   # Cloudflare D1 HTTP 网关
 ├── tests/                  # Vitest 与 Testing Library 测试
@@ -138,7 +132,7 @@ sayless/
 | `pnpm db:migrate:local` | 将 migrations 应用到 Wrangler 本地 D1 |
 | `pnpm db:seed:local` | 迁移并填充本地 E2E D1 |
 | `pnpm e2e:worker` | 在 8787 端口启动本地 Worker |
-| `pnpm e2e:prepare` | 准备 Playwright 所需的隔离数据 |
+| `pnpm e2e:prepare` | 迁移并填充 Playwright 所需数据 |
 | `pnpm e2e` | 准备数据并运行 Playwright E2E |
 | `pnpm e2e:production` | 对 `BASE_URL` 运行 Chromium 生产冒烟测试 |
 | `pnpm build:worker` | dry-run 构建 Cloudflare Worker |
@@ -202,7 +196,7 @@ pnpm build:worker
 
 ### 用户流程
 
-涉及认证、账户注销、求职全流程、移动端或简历工作区时运行：
+涉及认证、账户注销、移动端或简历工作区时运行：
 
 ```bash
 pnpm e2e
