@@ -72,9 +72,12 @@ cp .env.example .env.local
 | `INON_SSO_CLIENT_ID` | 是 | SAYLESS 在 iNon SSO 中的 OAuth client ID |
 | `INON_SSO_CLIENT_SECRET` | 是 | SAYLESS 的 OAuth client secret，仅服务端读取 |
 | `INON_SSO_SESSION_SECRET` | 是 | SAYLESS 项目会话加密密钥，至少 32 个字符 |
-| `INON_SSO_PUBLIC_ORIGIN` | 是 | 本地为 `http://localhost:3000`，线上为 `https://sayless.inon.space` |
+| `INON_SSO_PUBLIC_ORIGIN` | 是 | SAYLESS 自身 origin：本地为 `http://localhost:3000`，线上为 `https://sayless.inon.space` |
+| `INON_SSO_ISSUER` | 否 | 中央 SSO issuer；默认 `https://sso.inon.space/api/sso/auth` |
 
 `.env.local` 仅用于本地 Next.js。不要提交 `.env.local`、`.dev.vars`、OAuth client secret、session secret 或 gateway token。
+
+中央 SSO 的登录页与 OAuth API 位于 `https://sso.inon.space`；SAYLESS 自己的会话与回调仍使用 `https://sayless.inon.space`。`INON_SSO_PUBLIC_ORIGIN` 指 SAYLESS 自己的 origin，不要填成 SSO 的 origin。
 
 ### 3. 启动应用
 

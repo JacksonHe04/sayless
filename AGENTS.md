@@ -19,6 +19,7 @@ SAYLESS 是一个**只做简历**的工具：编辑结构化内容、调整版�
 ### 鉴权
 
 - 通过 iNon SSO 登录；账户设置页维护个人资料、密码与会话。
+- 中央身份平台在 `https://sso.inon.space`；SAYLESS 自身 origin 仍是 `https://sayless.inon.space`，OAuth 回调为 `/api/auth/inon/callback`。
 - `proxy.ts` 为未登录访客下发 `sayless_anon`（HttpOnly UUID，一年期）。
 
 ### Resumes
