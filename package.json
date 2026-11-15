@@ -21,7 +21,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e:prepare": "pnpm db:seed:local && tsx e2e/prepare.ts",
+    "e2e:prepare": "pnpm db:seed:local",
     "e2e": "pnpm e2e:prepare && playwright test",
     "e2e:production": "playwright test e2e/production-smoke.spec.ts --project=chromium",
     "check": "pnpm lint && pnpm typecheck"
@@ -30,10 +30,8 @@
     "@hookform/resolvers": "^5.2.2",
     "@inon-ai/inon-sso": "0.1.1",
     "@tanstack/react-query": "5.101.2",
-    "@types/pdf-parse": "^1.1.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "2.1.1",
-    "cmdk": "^1.1.1",
     "drizzle-orm": "^0.45.2",
     "lucide-react": "1.22.0",
     "next": "16.2.11",
@@ -43,7 +41,6 @@
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "react-hook-form": "7.80.0",
-    "recharts": "^3.6.0",
     "rehype-sanitize": "^6.0.0",
     "rehype-stringify": "^10.0.1",
     "remark-parse": "^11.0.0",
@@ -82,8 +79,7 @@
     "typescript": "6.0.3",
     "typescript-eslint": "^8.65.0",
     "vitest": "3.2.7",
-    "wrangler": "4.114.0",
-    "yaml": "2.9.0"
+    "wrangler": "4.114.0"
   },
   "pnpm": {
     "overrides": {
