@@ -13,6 +13,24 @@ import {
 import { cn } from "@/lib/utils";
 
 export const APP_TOPBAR_PORTAL_ID = "sayless-app-topbar";
+export const APP_TOPBAR_START_ID = "sayless-app-topbar-start";
+export const APP_TOPBAR_END_ID = "sayless-app-topbar-end";
+
+export function AppTopbarSlot({
+  slotId,
+  children,
+}: {
+  slotId: string;
+  children: ReactNode;
+}) {
+  const [container, setContainer] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setContainer(window.document.getElementById(slotId));
+  }, [slotId]);
+
+  return container ? createPortal(children, container) : null;
+}
 
 export function AppTopbarPortal({
   children,

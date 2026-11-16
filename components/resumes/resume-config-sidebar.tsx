@@ -92,6 +92,13 @@ export function ResumeConfigSidebar({
   onPhotoChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }) {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const font = config.font ?? { chineseSerif: false, latinSerif: false };
+
+  function updateFont(
+    changes: Partial<typeof font>,
+  ) {
+    onConfigChange({ ...config, font: { ...font, ...changes } });
+  }
 
   function updateAlignment(alignment: HeaderAlignment) {
     onConfigChange({ ...config, headerAlignment: alignment });
@@ -202,6 +209,28 @@ export function ResumeConfigSidebar({
                     })
                   }
                 />
+              </div>
+
+              <div className="grid gap-2">
+                <span className="text-xs font-medium text-muted-foreground">
+                  字体
+                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-foreground">中文衬线</span>
+                  <Switch
+                    label="中文衬线"
+                    checked={font.chineseSerif}
+                    onChange={(chineseSerif) => updateFont({ chineseSerif })}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-foreground">英文衬线</span>
+                  <Switch
+                    label="英文衬线"
+                    checked={font.latinSerif}
+                    onChange={(latinSerif) => updateFont({ latinSerif })}
+                  />
+                </div>
               </div>
 
               {config.photo.showPhoto ? (

@@ -19,6 +19,7 @@ import {
   SECTION_GAP_CLASS,
   TITLE_BOTTOM_CLASS,
 } from "@/components/resumes/resume-spacing";
+import { resumeFontFamily } from "@/components/resumes/resume-font";
 
 // 非间距的排版样式（字号、字重、颜色）保留在这里，间距统一见 resume-spacing.ts
 const sectionTitleClass = cn(
@@ -417,6 +418,9 @@ export function ResumePreview({
     <article
       id="resume-preview"
       className="min-w-0 text-black [&_strong]:font-semibold print:p-1"
+      style={{
+        fontFamily: resumeFontFamily(document.displayConfig.font),
+      }}
     >
       {document.displayConfig.sectionOrder.map((key) =>
         visible.has(key) && sections[key] ? (

@@ -156,6 +156,13 @@ const displayConfigSchema = z.object({
     showPhoto: z.boolean(),
     photoData: optionalText,
   }),
+  // 旧文档没有字体配置：默认保持原有的非衬线正文
+  font: z
+    .object({
+      chineseSerif: z.boolean().default(false),
+      latinSerif: z.boolean().default(false),
+    })
+    .default({ chineseSerif: false, latinSerif: false }),
 });
 
 export const resumeDocumentV1Schema = z.object({

@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ResumeEditor } from "@/components/resumes/resume-editor";
 import { ResumePreview } from "@/components/resumes/resume-preview";
+import { AppShell } from "@/components/app/app-shell";
 import type { ResumeRecord } from "@/modules/resumes/service";
 
 vi.mock("next/navigation", () => ({
@@ -40,6 +41,7 @@ const initial: ResumeRecord = {
       sectionOrder: ["header"],
       headerAlignment: "left",
       photo: { showPhoto: false },
+      font: { chineseSerif: false, latinSerif: false },
     },
   },
 };
@@ -119,7 +121,7 @@ describe("resume editor", () => {
     expect(within(listSidebar).getByText("产品简历")).toBeInTheDocument();
   });
 
-  it("clones the current resume from the topbar and switches to the copy", async () => {
+  it("clones a resume from the list menu and switches to the copy", async () => {
     const user = userEvent.setup();
     const fetchMock = vi.fn().mockImplementation(async (_url: string) => {
       const body = JSON.parse(
@@ -148,7 +150,20 @@ describe("resume editor", () => {
 
     render(<ResumeEditor initial={initial} />);
 
-    await user.click(screen.getByRole("button", { name: "克隆简历" }));
+    const listSidebar = screen.getByRole("complementary", {
+      name: "简历列表",
+    });
+    expect(
+      screen.queryByRole("button", { name: "克隆简历" }),
+    ).not.toBeInTheDocument();
+    await user.click(
+      within(listSidebar).getByRole("button", {
+        name: "更多操作：产品简历",
+      }),
+    );
+    await user.click(
+      within(listSidebar).getByRole("button", { name: "克隆" }),
+    );
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/resumes",
       expect.objectContaining({ method: "POST" }),
@@ -156,9 +171,6 @@ describe("resume editor", () => {
     expect(
       screen.getByRole("button", { name: "编辑简历名称：产品简历（副本）" }),
     ).toBeVisible();
-    const listSidebar = screen.getByRole("complementary", {
-      name: "简历列表",
-    });
     await expect
       .poll(() =>
         within(listSidebar)
@@ -168,8 +180,118 @@ describe("resume editor", () => {
       .toBe("page");
   });
 
-  it("lets guests edit the demo resume and materializes it on first save only", async () => {
+  it("shows resume versions and refreshes them after an autosave", async () => {
     const user = userEvent.setup();
+    const save = vi.fn().mockResolvedValue({
+      version: 2,
+      updatedAt: new Date("2026-07-26T00:00:00.000Z"),
+    });
+    render(<ResumeEditor initial={initial} save={save} autosaveDelay={10} />);
+
+    const listSidebar = screen.getByRole("complementary", {
+      name: "简历列表",
+    });
+    const toolbar = screen.getByRole("banner", {
+      name: "简历编辑工具栏",
+    });
+    expect(within(listSidebar).getByLabelText("版本 1")).toHaveTextContent(
+      "v1",
+    );
+    expect(within(toolbar).getByLabelText("版本 1")).toHaveTextContent("v1");
+
+    await user.click(screen.getByRole("switch", { name: "显示照片" }));
+
+    await vi.waitFor(() =>
+      expect(within(listSidebar).getByLabelText("版本 2")).toHaveTextContent(
+        "v2",
+      ),
+    );
+    expect(within(toolbar).getByLabelText("版本 2")).toHaveTextContent("v2");
+  });
+
+  it("syncs name edits to the resume list without waiting for saving", async () => {
+    const user = userEvent.setup();
+    const save = vi.fn().mockResolvedValue({ version: 2 });
+    render(
+      <ResumeEditor initial={initial} save={save} autosaveDelay={10_000} />,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "编辑简历名称：产品简历" }),
+    );
+    const input = screen.getByLabelText("简历名称");
+    await user.clear(input);
+    await user.type(input, "新名字");
+    await user.click(screen.getByRole("button", { name: "确认" }));
+
+    const listSidebar = screen.getByRole("complementary", {
+      name: "简历列表",
+    });
+    expect(
+      within(listSidebar).getByRole("button", { name: "切换到新名字" }),
+    ).toBeInTheDocument();
+  });
+
+  it("collapses both desktop panels from the topbar toggles", async () => {
+    const user = userEvent.setup();
+    render(
+      <AppShell account={<span>Jackson</span>}>
+        <ResumeEditor initial={initial} />
+      </AppShell>,
+    );
+
+    const left = screen.getByRole("complementary", { name: "简历配置" });
+    const right = screen.getByRole("complementary", { name: "简历列表" });
+
+    await user.click(
+      await screen.findByRole("button", { name: "收起左侧栏" }),
+    );
+    expect(left).toHaveClass("lg:hidden");
+    expect(
+      screen.getByRole("button", { name: "展开左侧栏" }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "收起右侧栏" }));
+    expect(right).toHaveClass("lg:hidden");
+    expect(
+      screen.getByRole("button", { name: "展开右侧栏" }),
+    ).toBeInTheDocument();
+  });
+
+  it("opens only one overlay panel at a time on mobile", async () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      matches: false,
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }));
+    const user = userEvent.setup();
+    render(
+      <AppShell account={<span>Jackson</span>}>
+        <ResumeEditor initial={initial} />
+      </AppShell>,
+    );
+
+    await user.click(
+      await screen.findByRole("button", { name: "展开左侧栏" }),
+    );
+    expect(
+      screen.getByRole("button", { name: "收起左侧栏" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "展开右侧栏" }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "展开右侧栏" }));
+    expect(
+      screen.getByRole("button", { name: "展开左侧栏" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "收起右侧栏" }),
+    ).toBeInTheDocument();
+  });
+
+  it("lets guests edit the demo resume and materializes it on first save only", async () => {    const user = userEvent.setup();
     const requests: Array<{ url: string; method: string }> = [];
     const fetchMock = vi.fn().mockImplementation(async (_url: string) => {
       requests.push({ url: _url, method: "PATCH" });
@@ -612,6 +734,24 @@ describe("resume editor", () => {
     expect(
       screen.queryByRole("heading", { name: "专业技能" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("applies Chinese and Latin serif settings independently", () => {
+    const document = structuredClone(initial.document);
+    document.displayConfig.font = { chineseSerif: true, latinSerif: false };
+    const { container, rerender } = render(
+      <ResumePreview document={document} />,
+    );
+
+    const preview = () =>
+      container.querySelector("#resume-preview") as HTMLElement;
+    expect(preview().style.fontFamily).toContain("Songti SC");
+    expect(preview().style.fontFamily).toContain("Geist");
+
+    document.displayConfig.font = { chineseSerif: false, latinSerif: true };
+    rerender(<ResumePreview document={document} />);
+    expect(preview().style.fontFamily).toContain("Georgia");
+    expect(preview().style.fontFamily).toContain("PingFang SC");
   });
 
   it("renders multiple education entries in the preview", () => {

@@ -22,6 +22,7 @@ export const defaultResumeDisplayConfig: ResumeDisplayConfig = {
   ],
   headerAlignment: "left",
   photo: { showPhoto: false },
+  font: { chineseSerif: false, latinSerif: false },
 };
 
 export function createDefaultResumeDocument(): ResumeDocumentV1 {

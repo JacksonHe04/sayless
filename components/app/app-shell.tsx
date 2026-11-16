@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { type ReactNode } from "react";
 
-import { APP_TOPBAR_PORTAL_ID } from "@/components/app/app-topbar";
+import {
+  APP_TOPBAR_END_ID,
+  APP_TOPBAR_PORTAL_ID,
+  APP_TOPBAR_START_ID,
+} from "@/components/app/app-topbar";
 import { BrandMark } from "@/components/ui/brand-mark";
 
 export function AppShell({
@@ -14,6 +18,10 @@ export function AppShell({
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-background print:block print:h-auto print:overflow-visible">
       <header className="relative z-30 flex h-16 min-w-0 shrink-0 items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur-xl sm:gap-3 sm:px-4 print:hidden">
+        <div
+          id={APP_TOPBAR_START_ID}
+          className="flex shrink-0 items-center"
+        />
         <Link
           href="/resumes"
           aria-label="SAYLESS 首页"
@@ -32,6 +40,7 @@ export function AppShell({
           id={APP_TOPBAR_PORTAL_ID}
           className="h-full min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         />
+        <div id={APP_TOPBAR_END_ID} className="flex shrink-0 items-center" />
         <div className="flex shrink-0 items-center">{account}</div>
       </header>
 

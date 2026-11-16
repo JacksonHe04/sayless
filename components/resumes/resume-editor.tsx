@@ -45,7 +45,7 @@ type SaveInput = {
   document: ResumeDocumentV1;
 };
 
-type SaveResult = { version: number };
+type SaveResult = { version: number; updatedAt?: Date | string };
 
 function serializeDraft(name: string, document: ResumeDocumentV1) {
   return JSON.stringify({ name, document });
@@ -64,7 +64,10 @@ async function saveThroughApi(input: SaveInput): Promise<SaveResult> {
   if (!response.ok || !payload.resume) {
     throw new Error(payload.error?.message ?? "保存失败");
   }
-  return { version: payload.resume.version };
+  return {
+    version: payload.resume.version,
+    updatedAt: payload.resume.updatedAt,
+  };
 }
 
 function toMarkdown(data: ResumeData, sectionOrder: ResumeSectionKey[]) {
@@ -174,6 +177,7 @@ export function ResumeEditor({
   const [resumes, setResumes] = useState<ResumeRecord[]>(availableResumes);
   const [currentId, setCurrentId] = useState(initial.id);
   const [name, setName] = useState(initial.name);
+  const [activeVersion, setActiveVersion] = useState(initial.version);
   const [document, setDocument] = useState<ResumeDocumentV1>(
     preparedInitial,
   );
@@ -186,11 +190,13 @@ export function ResumeEditor({
   const [photoError, setPhotoError] = useState<string>();
   const [photoUploading, setPhotoUploading] = useState(false);
   const [shareBusy, setShareBusy] = useState(false);
-  const [cloneBusy, setCloneBusy] = useState(false);
+  const [cloneBusyId, setCloneBusyId] = useState<string>();
   const [leftSidebarWidth, setLeftSidebarWidth] = useState(320);
   const [resizing, setResizing] = useState(false);
-  const [showLeftSidebar, setShowLeftSidebar] = useState(false);
-  const [showRightSidebar, setShowRightSidebar] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(true);
+  // undefined = 跟随断点：桌面展开、移动端收起
+  const [leftPanel, setLeftPanel] = useState<boolean>();
+  const [rightPanel, setRightPanel] = useState<boolean>();
   const [actionError, setActionError] = useState<string>();
   const containerRef = useRef<HTMLElement>(null);
   const targetIdRef = useRef(initial.id);
@@ -206,7 +212,11 @@ export function ResumeEditor({
     const drafts = new Map<string, string>();
     const versions = new Map<string, number>();
     for (const record of [initial, ...availableResumes]) {
-      drafts.set(record.id, serializeDraft(record.name, record.document));
+      // 当前简历展示的是归一化后的文档；用同一份快照作为「已保存」基线，
+      // 避免载入时把归一化差异误判成一次修改而自增版本。
+      const document =
+        record.id === initial.id ? preparedInitial : record.document;
+      drafts.set(record.id, serializeDraft(record.name, document));
       versions.set(record.id, record.version);
     }
     return { drafts, versions };
@@ -218,6 +228,85 @@ export function ResumeEditor({
     typeof window === "undefined"
       ? ""
       : `${window.location.origin}/resumes/share/${currentId}`;
+  const leftPanelOpen = leftPanel ?? isDesktop;
+  const rightPanelOpen = rightPanel ?? isDesktop;
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const query = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIsDesktop(query.matches);
+    update();
+    query.addEventListener?.("change", update);
+    return () => query.removeEventListener?.("change", update);
+  }, []);
+
+  // 窗口重新获得焦点时同步列表元数据，让远程设备的修改/版本变化及时反映出来。
+  useEffect(() => {
+    if (isGuest) return;
+    let cancelled = false;
+
+    async function syncMetadata() {
+      try {
+        const response = await appFetch("/api/resumes");
+        if (!response.ok) return;
+        const payload = (await response.json().catch(() => ({}))) as {
+          resumes?: ResumeRecord[];
+        };
+        if (!payload.resumes || cancelled) return;
+        const remote = payload.resumes;
+        const remoteCurrent = remote.find((item) => item.id === currentId);
+        if (remoteCurrent) {
+          setActiveVersion((current) =>
+            Math.max(current, remoteCurrent.version),
+          );
+        }
+        setResumes((prev) => {
+          const known = new Set(prev.map((record) => record.id));
+          const merged = prev.map((record) => {
+            const next = remote.find((item) => item.id === record.id);
+            if (!next) return record;
+            const remoteUpdatedAt = new Date(next.updatedAt);
+            return {
+              ...record,
+              // 当前简历的名称由编辑器实时维护，避免旧的远端名称覆盖草稿
+              name: record.id === currentId ? record.name : next.name,
+              version: Math.max(record.version, next.version),
+              isPublic: next.isPublic,
+              updatedAt:
+                remoteUpdatedAt > record.updatedAt
+                  ? remoteUpdatedAt
+                  : record.updatedAt,
+            };
+          });
+          for (const next of remote) {
+            if (!known.has(next.id)) merged.push(next);
+          }
+          return merged;
+        });
+      } catch {
+        // 离线时保持本地状态
+      }
+    }
+
+    window.addEventListener("focus", syncMetadata);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("focus", syncMetadata);
+    };
+  }, [currentId, isGuest]);
+
+  function toggleLeftPanel() {
+    const next = !leftPanelOpen;
+    setLeftPanel(next);
+    // 移动端左右栏只能同时展开一个
+    if (!isDesktop) setRightPanel(false);
+  }
+
+  function toggleRightPanel() {
+    const next = !rightPanelOpen;
+    setRightPanel(next);
+    if (!isDesktop) setLeftPanel(false);
+  }
 
   function showActionError(message: string) {
     setActionError(message);
@@ -286,6 +375,22 @@ export function ResumeEditor({
         });
         state.versions.set(targetId, result.version);
         state.drafts.set(targetId, serialized);
+        const savedAt = result.updatedAt ? new Date(result.updatedAt) : new Date();
+        if (targetId === (guestRecordId.current ?? targetIdRef.current)) {
+          setActiveVersion(result.version);
+        }
+        setResumes((prev) =>
+          prev.map((record) =>
+            record.id === targetId
+              ? {
+                  ...record,
+                  name: draftName,
+                  version: result.version,
+                  updatedAt: savedAt,
+                }
+              : record,
+          ),
+        );
         return true;
       } catch {
         return false;
@@ -334,8 +439,10 @@ export function ResumeEditor({
     void persist(); // 先排队保存当前简历的未落盘修改（闭包捕获的是旧文档）
     targetIdRef.current = record.id;
     const prepared = prepareDocument(record.document);
+    saveState.drafts.set(record.id, serializeDraft(record.name, prepared));
     setCurrentId(record.id);
     setName(record.name);
+    setActiveVersion(record.version);
     setDocument(prepared);
     setJsonText(JSON.stringify(prepared.data, null, 2));
     setJsonError(undefined);
@@ -347,7 +454,9 @@ export function ResumeEditor({
 
   function switchTo(id: string) {
     const record = resumes.find((item) => item.id === id);
-    if (record) applyRecord(record);
+    if (!record) return;
+    applyRecord(record);
+    if (!isDesktop) setRightPanel(false);
   }
 
   function adoptRecord(record: ResumeRecord) {
@@ -360,6 +469,17 @@ export function ResumeEditor({
     state.drafts.set(record.id, serializeDraft(record.name, record.document));
     state.versions.set(record.id, record.version);
     applyRecord(record);
+    if (!isDesktop) setRightPanel(false);
+  }
+
+  // 名称提交后立即同步到右侧列表，不等待自动保存的往返
+  function changeName(nextName: string) {
+    setName(nextName);
+    setResumes((prev) =>
+      prev.map((record) =>
+        record.id === currentId ? { ...record, name: nextName } : record,
+      ),
+    );
   }
 
   async function createNew() {
@@ -371,24 +491,31 @@ export function ResumeEditor({
     }
   }
 
-  async function cloneCurrent() {
+  async function cloneResume(record: ResumeRecord) {
     if (isGuest) return;
-    setCloneBusy(true);
+    const source =
+      record.id === currentId
+        ? { name, document }
+        : { name: record.name, document: record.document };
+    setCloneBusyId(record.id);
     try {
-      const record = await createResume(`${name}（副本）`, document);
-      // 克隆记录的照片 blob 已由服务端落库；这里把展示用的 data URL 一起带过来
+      const cloned = await createResume(
+        `${source.name}（副本）`,
+        source.document,
+      );
+      // 克隆接口会剥离照片 blob；把本地展示用的 data URL 带回来
       if (
-        !record.document.displayConfig.photo.photoData &&
-        document.displayConfig.photo.photoData
+        !cloned.document.displayConfig.photo.photoData &&
+        source.document.displayConfig.photo.photoData
       ) {
-        record.document.displayConfig.photo.photoData =
-          document.displayConfig.photo.photoData;
+        cloned.document.displayConfig.photo.photoData =
+          source.document.displayConfig.photo.photoData;
       }
-      adoptRecord(record);
+      adoptRecord(cloned);
     } catch {
       showActionError("克隆失败，请稍后重试");
     } finally {
-      setCloneBusy(false);
+      setCloneBusyId(undefined);
     }
   }
 
@@ -539,16 +666,14 @@ export function ResumeEditor({
     <div className="relative flex h-[calc(100dvh-4rem)] flex-col overflow-hidden overscroll-none bg-background print:h-auto print:overflow-visible">
       <ResumeTopbar
         name={name}
-        onNameChange={setName}
+        version={activeVersion}
+        onNameChange={changeName}
         onExportPdf={() => window.print()}
         onCopyMarkdown={copyMarkdown}
-        onToggleLeftSidebar={() => setShowLeftSidebar((current) => !current)}
-        onToggleRightSidebar={() =>
-          setShowRightSidebar((current) => !current)
-        }
-        canClone={!isGuest}
-        cloneBusy={cloneBusy}
-        onClone={() => void cloneCurrent()}
+        leftPanelOpen={leftPanelOpen}
+        onToggleLeftPanel={toggleLeftPanel}
+        rightPanelOpen={rightPanelOpen}
+        onToggleRightPanel={isGuest ? undefined : toggleRightPanel}
         canShare={!isGuest}
         isPublic={isGuest ? false : currentRecord.isPublic}
         shareBusy={shareBusy}
@@ -560,19 +685,19 @@ export function ResumeEditor({
         ref={containerRef}
         className="relative flex min-h-0 flex-1 overflow-hidden print:block print:overflow-visible"
       >
-        {showLeftSidebar ? (
+        {leftPanelOpen ? (
           <button
             type="button"
             aria-label="关闭侧边栏"
-            onClick={() => setShowLeftSidebar(false)}
+            onClick={() => setLeftPanel(false)}
             className="absolute inset-0 z-30 bg-black/20 backdrop-blur-[1px] lg:hidden"
           />
         ) : null}
-        {showRightSidebar ? (
+        {!isGuest && rightPanelOpen ? (
           <button
             type="button"
             aria-label="关闭简历列表"
-            onClick={() => setShowRightSidebar(false)}
+            onClick={() => setRightPanel(false)}
             className="absolute inset-0 z-30 bg-black/20 backdrop-blur-[1px] lg:hidden"
           />
         ) : null}
@@ -580,8 +705,9 @@ export function ResumeEditor({
         <aside
           aria-label="简历配置"
           className={cn(
-            "absolute inset-y-0 left-0 z-40 flex h-full shrink-0 flex-col border-r border-border bg-background shadow-xl transition-transform duration-200 ease-out lg:relative lg:translate-x-0 lg:shadow-none print:hidden",
-            showLeftSidebar ? "translate-x-0" : "-translate-x-full",
+            "absolute inset-y-0 left-0 z-40 flex h-full max-w-[85vw] shrink-0 flex-col border-r border-border bg-background shadow-xl transition-transform duration-200 ease-out lg:relative lg:max-w-none lg:translate-x-0 lg:shadow-none print:hidden",
+            leftPanelOpen ? "translate-x-0" : "-translate-x-full",
+            leftPanel === false && "lg:hidden",
           )}
           style={{ width: leftSidebarWidth }}
         >
@@ -601,12 +727,14 @@ export function ResumeEditor({
           />
         </aside>
 
-        <button
-          type="button"
-          aria-label="调整左侧边栏宽度"
-          onMouseDown={() => setResizing(true)}
-          className="z-20 hidden w-1 cursor-col-resize bg-border transition-colors hover:bg-foreground/25 lg:block print:hidden"
-        />
+        {leftPanelOpen ? (
+          <button
+            type="button"
+            aria-label="调整左侧边栏宽度"
+            onMouseDown={() => setResizing(true)}
+            className="z-20 hidden w-1 cursor-col-resize bg-border transition-colors hover:bg-foreground/25 lg:block print:hidden"
+          />
+        ) : null}
 
         <section
           role="main"
@@ -622,8 +750,9 @@ export function ResumeEditor({
           <aside
             aria-label="简历列表"
             className={cn(
-              "absolute inset-y-0 right-0 z-40 flex h-full w-72 shrink-0 flex-col border-l border-border bg-background shadow-xl transition-transform duration-200 ease-out lg:relative lg:translate-x-0 lg:shadow-none print:hidden",
-              showRightSidebar ? "translate-x-0" : "translate-x-full",
+              "absolute inset-y-0 right-0 z-40 flex h-full w-72 max-w-[85vw] shrink-0 flex-col border-l border-border bg-background shadow-xl transition-transform duration-200 ease-out lg:relative lg:max-w-none lg:translate-x-0 lg:shadow-none print:hidden",
+              rightPanelOpen ? "translate-x-0" : "translate-x-full",
+              rightPanel === false && "lg:hidden",
             )}
           >
             <ResumeListSidebar
@@ -631,6 +760,8 @@ export function ResumeEditor({
               resumes={resumes}
               onSelect={switchTo}
               onCreate={() => void createNew()}
+              onClone={(record) => void cloneResume(record)}
+              cloneBusyId={cloneBusyId}
               onDelete={(record) => void removeResume(record)}
             />
           </aside>

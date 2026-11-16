@@ -39,6 +39,11 @@ describe("resume document schema", () => {
 
     expect(document.schemaVersion).toBe(1);
     expect(document.data.header.name).toBe("何锦诚");
+    // 旧文档没有字体配置时补默认值，保持非衬线正文
+    expect(document.displayConfig.font).toEqual({
+      chineseSerif: false,
+      latinSerif: false,
+    });
   });
 
   it("accepts multiple education entries while preserving legacy fields", () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Link2, MoreVertical, Plus, Trash2 } from "lucide-react";
+import { Check, Copy, Link2, MoreVertical, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ export function ResumeListSidebar({
   resumes,
   onSelect,
   onCreate,
+  onClone,
+  cloneBusyId,
   onDelete,
   canCreate = true,
 }: {
@@ -19,6 +21,8 @@ export function ResumeListSidebar({
   resumes: ResumeRecord[];
   onSelect: (id: string) => void;
   onCreate: () => void;
+  onClone: (resume: ResumeRecord) => void;
+  cloneBusyId?: string;
   onDelete: (resume: ResumeRecord) => void;
   canCreate?: boolean;
 }) {
@@ -81,14 +85,23 @@ export function ResumeListSidebar({
                 <h3 className="mb-1 truncate pr-14 text-sm font-medium text-foreground">
                   {resume.name}
                 </h3>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(resume.updatedAt).toLocaleString("zh-CN", {
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
+                <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                  <span>
+                    {new Date(resume.updatedAt).toLocaleString("zh-CN", {
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                  <span
+                    aria-label={`版本 ${resume.version}`}
+                    title={`版本 ${resume.version}`}
+                    className="shrink-0 rounded border border-border bg-muted/50 px-1 py-0.5 font-[var(--font-data)] text-[10px]"
+                  >
+                    v{resume.version}
+                  </span>
+                </div>
                 {resume.isPublic ? (
                   <p className="mt-1.5 inline-flex items-center gap-1 text-xs text-[#3d8c5a]">
                     <Link2 className="size-3" aria-hidden="true" />
@@ -117,6 +130,18 @@ export function ResumeListSidebar({
                     className="fixed inset-0 z-40 cursor-default"
                   />
                   <div className="absolute right-2 top-10 z-50 w-40 rounded-lg border border-border bg-popover p-1 shadow-md">
+                    <button
+                      type="button"
+                      disabled={cloneBusyId === resume.id}
+                      onClick={() => {
+                        setActiveMenuId(undefined);
+                        onClone(resume);
+                      }}
+                      className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                    >
+                      <Copy className="size-4" />
+                      {cloneBusyId === resume.id ? "克隆中…" : "克隆"}
+                    </button>
                     <button
                       type="button"
                       onClick={() => requestDelete(resume)}

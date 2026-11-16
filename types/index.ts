@@ -159,6 +159,14 @@ export interface PhotoConfig {
   photoData?: string
 }
 
+// 字体配置：中文与英文可以分别选择衬线 / 非衬线
+export interface ResumeFontConfig {
+  /** 中文使用衬线字体 */
+  chineseSerif: boolean
+  /** 英文与数字使用衬线字体 */
+  latinSerif: boolean
+}
+
 // 简历显示配置
 export interface ResumeDisplayConfig {
   sections: ResumeSectionConfig[]
@@ -167,6 +175,8 @@ export interface ResumeDisplayConfig {
   headerAlignment: HeaderAlignment
   /** 照片配置 */
   photo: PhotoConfig
+  /** 正文中英文衬线配置 */
+  font: ResumeFontConfig
 }
 
 // 服务端持久化使用的版本化简历文档。后续数据结构升级必须新增版本，

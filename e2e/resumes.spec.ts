@@ -24,6 +24,24 @@ test("switches, clones, shares, and persists resumes from the three-column works
   });
   await expect(listSidebar).toBeVisible();
 
+  // 顶栏两端的图标可以完全收起 / 展开左右栏
+  await page.getByRole("button", { name: "收起左侧栏" }).click();
+  await expect(
+    page.getByRole("complementary", { name: "简历配置" }),
+  ).toBeHidden();
+  await page.getByRole("button", { name: "展开左侧栏" }).click();
+  await expect(
+    page.getByRole("complementary", { name: "简历配置" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "收起右侧栏" }).click();
+  await expect(
+    page.getByRole("complementary", { name: "简历列表" }),
+  ).toBeHidden();
+  await page.getByRole("button", { name: "展开右侧栏" }).click();
+  await expect(
+    page.getByRole("complementary", { name: "简历列表" }),
+  ).toBeVisible();
+
   // 右侧列表点击切换：瞬时、URL 更新、顶栏名称与预览跟随，无骨架屏
   const firstItem = listSidebar.locator("button[aria-label^='切换到']").first();
   const firstName = (await firstItem.getAttribute("aria-label"))!.replace(
@@ -41,8 +59,11 @@ test("switches, clones, shares, and persists resumes from the three-column works
   // 不出现加载骨架
   await expect(page.getByText("简历编辑器加载中")).toHaveCount(0);
 
-  // 顶栏克隆当前简历并切换到副本
-  await page.getByRole("button", { name: "克隆简历" }).click();
+  // 右侧列表三点菜单克隆当前简历并切换到副本
+  await listSidebar
+    .getByRole("button", { name: `更多操作：${firstName}` })
+    .click();
+  await page.getByRole("button", { name: "克隆", exact: true }).click();
   await expect(
     page.getByRole("button", { name: `编辑简历名称：${firstName}（副本）` }),
   ).toBeVisible({ timeout: 5000 });
