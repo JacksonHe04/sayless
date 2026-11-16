@@ -34,7 +34,7 @@ export function AppTopbarPortal({
   const content = (
     <div
       className={cn(
-        "flex h-full min-w-max w-full items-center gap-2 px-3 sm:px-4",
+        "flex h-full min-w-max w-full items-center gap-2 px-1",
         className,
       )}
     >
@@ -47,7 +47,7 @@ export function AppTopbarPortal({
     return (
       <header
         aria-label={fallbackLabel}
-        className="flex h-16 shrink-0 items-center border-b border-border bg-background"
+        className="flex h-16 shrink-0 items-center border-b border-border bg-background px-4"
       >
         {content}
       </header>

@@ -1,33 +1,32 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { AppShell } from "@/components/app/app-shell";
 import { AppTopbarPortal } from "@/components/app/app-topbar";
 
-vi.mock("next/navigation", () => ({
-  usePathname: () => "/resumes/resume-a",
-}));
-
-afterEach(() => {
-  cleanup();
-  window.localStorage.clear();
-});
+afterEach(cleanup);
 
 describe("application shell", () => {
-  it("keeps the primary sidebar around the resume editor route", () => {
+  it("renders a full-width topbar with the brand and account entry", () => {
     render(
-      <AppShell account={<span>Jackson</span>}>
+      <AppShell account={<a href="/settings">Jackson</a>}>
         <div>简历编辑器</div>
       </AppShell>,
     );
 
+    const header = screen.getByRole("banner");
+    expect(header).toHaveClass("h-16", "border-b");
+    expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
     expect(
-      screen.getByRole("navigation", { name: "主要导航" }),
+      screen.getByRole("link", { name: "SAYLESS 首页" }),
+    ).toHaveAttribute("href", "/resumes");
+    expect(
+      screen.getByRole("link", { name: "Jackson" }),
     ).toBeInTheDocument();
     expect(screen.getByText("简历编辑器")).toBeInTheDocument();
   });
 
-  it("aligns a persistent page toolbar with the sidebar brand area", async () => {
+  it("aligns a persistent page toolbar with the app header", async () => {
     render(
       <AppShell account={<span>Jackson</span>}>
         <AppTopbarPortal>
@@ -40,15 +39,8 @@ describe("application shell", () => {
     const toolbar = await screen.findByRole("button", {
       name: "页面操作",
     });
-    const appHeader = toolbar.closest("header");
-    const brandLink = screen.getByRole("link", {
-      name: "SAYLESS 首页",
-    });
-    const brandArea = brandLink.parentElement;
 
-    expect(appHeader).toHaveClass("h-16", "border-b");
-    expect(appHeader).not.toHaveClass("lg:hidden");
-    expect(brandArea).toHaveClass("h-16", "border-b");
+    expect(toolbar.closest("header")).toBe(screen.getByRole("banner"));
   });
 
   it("locks the application to the viewport and scrolls only its content", () => {
@@ -66,10 +58,6 @@ describe("application shell", () => {
       "overscroll-y-none",
     );
     expect(main.parentElement).toHaveClass(
-      "h-dvh",
-      "overflow-hidden",
-    );
-    expect(main.parentElement?.parentElement).toHaveClass(
       "h-dvh",
       "overflow-hidden",
     );

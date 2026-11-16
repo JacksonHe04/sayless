@@ -1,13 +1,8 @@
-"use client";
-
-import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { type ReactNode } from "react";
 
-import {
-  APP_TOPBAR_PORTAL_ID,
-} from "@/components/app/app-topbar";
-import { BottomNav } from "@/components/app/bottom-nav";
-import { SIDEBAR_COLLAPSED_WIDTH, Sidebar } from "@/components/app/sidebar";
+import { APP_TOPBAR_PORTAL_ID } from "@/components/app/app-topbar";
+import { BrandMark } from "@/components/ui/brand-mark";
 
 export function AppShell({
   account,
@@ -16,34 +11,33 @@ export function AppShell({
   account: ReactNode;
   children: ReactNode;
 }) {
-  const pathname = usePathname();
-
   return (
-    <div
-      className="h-dvh overflow-hidden bg-background print:block print:h-auto print:overflow-visible lg:grid"
-      style={{
-        gridTemplateColumns: `${SIDEBAR_COLLAPSED_WIDTH}px minmax(0, 1fr)`,
-      }}
-    >
-      {/* 桌面端左侧图标栏 */}
-      <div className="fixed inset-y-0 left-0 z-40 hidden print:hidden lg:block" style={{ width: SIDEBAR_COLLAPSED_WIDTH }}>
-        <Sidebar account={account} pathname={pathname} collapsed />
-      </div>
+    <div className="flex h-dvh flex-col overflow-hidden bg-background print:block print:h-auto print:overflow-visible">
+      <header className="relative z-30 flex h-16 min-w-0 shrink-0 items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur-xl sm:gap-3 sm:px-4 print:hidden">
+        <Link
+          href="/resumes"
+          aria-label="SAYLESS 首页"
+          className="flex shrink-0 items-center gap-2 rounded-lg py-1.5 pr-1"
+        >
+          <BrandMark size="sm" className="rounded-md" />
+          <span className="hidden text-sm font-semibold tracking-[-0.02em] sm:block">
+            SAYLESS
+          </span>
+        </Link>
+        <span
+          aria-hidden="true"
+          className="hidden h-6 w-px shrink-0 bg-border sm:block"
+        />
+        <div
+          id={APP_TOPBAR_PORTAL_ID}
+          className="h-full min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        />
+        <div className="flex shrink-0 items-center">{account}</div>
+      </header>
 
-      <div className="flex h-dvh min-w-0 flex-col overflow-hidden print:block print:h-auto print:overflow-visible lg:col-start-2">
-        <header className="relative z-30 flex h-16 min-w-0 shrink-0 items-center border-b border-border bg-background/95 backdrop-blur-xl print:hidden">
-          <div
-            id={APP_TOPBAR_PORTAL_ID}
-            className="h-full min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          />
-        </header>
-        <main className="min-h-0 flex-1 overflow-y-auto overscroll-y-none pb-20 print:overflow-visible lg:pb-0">
-          {children}
-        </main>
-      </div>
-
-      {/* 移动端底部导航 */}
-      <BottomNav />
+      <main className="min-h-0 flex-1 overflow-y-auto overscroll-y-none print:overflow-visible">
+        {children}
+      </main>
     </div>
   );
 }

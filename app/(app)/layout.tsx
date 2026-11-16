@@ -1,10 +1,7 @@
 import { Suspense } from "react";
 
+import { AppAccount, AppAccountSkeleton } from "@/components/app/app-account";
 import { AppShell } from "@/components/app/app-shell";
-import {
-  SidebarAccount,
-  SidebarAccountSkeleton,
-} from "@/components/app/sidebar-account";
 
 export default function ProductLayout({
   children,
@@ -14,8 +11,8 @@ export default function ProductLayout({
   return (
     <AppShell
       account={
-        <Suspense fallback={<SidebarAccountSkeleton />}>
-          <SidebarAccount />
+        <Suspense fallback={<AppAccountSkeleton />}>
+          <AppAccount />
         </Suspense>
       }
     >
